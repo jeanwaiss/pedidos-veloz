@@ -1,0 +1,74 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  DOCKER_REGISTRY: "docker.io"  # Simulado (pode ser Docker Hub, ECR, etc.)
+  IMAGE_TAG: "v1.0.0"
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout do código
+      uses: actions/checkout@v3
+    
+    - name: Build das imagens Docker
+      run: |
+        docker build -t api-gateway:${{ env.IMAGE_TAG }} ./api-gateway
+        docker build -t servico-pedidos:${{ env.IMAGE_TAG }} ./servico-pedidos
+        docker build -t servico-pagamentos:${{ env.IMAGE_TAG }} ./servico-pagamentos
+        docker build -t servico-estoque:${{ env.IMAGE_TAG }} ./servico-estoque
+    
+    - name: Rodar os containers com Docker Compose
+      run: docker-compose up -d
+    
+    - name: Testar API Gateway (health check)
+      run: |
+        sleep 10
+        curl -f http://localhost:8080/health || exit 1
+        echo "✅ Health check passou!"
+    
+    - name: Testar endpoints da API
+      run: |
+        curl -f http://localhost:8080/pedidos || exit 1
+        curl -f http://localhost:8080/estoque || exit 1
+        curl -f http://localhost:8080/pagamentos || exit 1
+        echo "✅ Todos os endpoints responderam!"
+    
+    - name: Parar os containers
+      run: docker-compose down
+
+  deploy:
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+    - name: Checkout do código
+      uses: actions/checkout@v3
+    
+    - name: 📦 Aplicar manifestos do Kubernetes (SIMULADO)
+      run: |
+        echo "🔐 Usando secrets do GitHub Actions:"
+        echo "   - DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}"
+        echo "   - DOCKER_PASSWORD: [MASCARADO]"
+        echo ""
+        echo "📦 Aplicando manifestos do Kubernetes..."
+        echo "   - deployment.yaml"
+        echo "   - service.yaml"
+        echo "   - configmap.yaml"
+        echo "   - secret.yaml"
+        echo "   - hpa.yaml"
+        echo ""
+        echo "✅ Deployment concluído com sucesso!"
+        echo "🚀 Aplicação disponível em: http://api-gateway:8080"
+    
+    - name: Simular rollback (se necessário)
+      run: |
+        echo "🔙 Comando de rollback: kubectl rollout undo deployment/api-gateway"

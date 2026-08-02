@@ -1,0 +1,84 @@
+version: '3.8'
+
+services:
+  # API Gateway - Entrada da aplicação
+  api-gateway:
+    build: ./api-gateway
+    ports:
+      - "8080:8080"
+    environment:
+      - PEDIDOS_URL=http://servico-pedidos:3001
+      - PAGAMENTOS_URL=http://servico-pagamentos:3002
+      - ESTOQUE_URL=http://servico-estoque:3003
+    depends_on:
+      - servico-pedidos
+      - servico-pagamentos
+      - servico-estoque
+    networks:
+      - pedidos-network
+
+  # Serviço de Pedidos
+  servico-pedidos:
+    build: ./servico-pedidos
+    ports:
+      - "3001:3001"
+    environment:
+      - DB_HOST=postgres
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+      - DB_NAME=pedidos
+    depends_on:
+      - postgres
+    networks:
+      - pedidos-network
+
+  # Serviço de Pagamentos
+  servico-pagamentos:
+    build: ./servico-pagamentos
+    ports:
+      - "3002:3002"
+    environment:
+      - DB_HOST=postgres
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+      - DB_NAME=pedidos
+    depends_on:
+      - postgres
+    networks:
+      - pedidos-network
+
+  # Serviço de Estoque
+  servico-estoque:
+    build: ./servico-estoque
+    ports:
+      - "3003:3003"
+    environment:
+      - DB_HOST=postgres
+      - DB_USER=postgres
+      - DB_PASSWORD=postgres
+      - DB_NAME=pedidos
+    depends_on:
+      - postgres
+    networks:
+      - pedidos-network
+
+  # Banco de Dados PostgreSQL
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=pedidos
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - pedidos-network
+
+networks:
+  pedidos-network:
+    driver: bridge
+
+volumes:
+  postgres_data:

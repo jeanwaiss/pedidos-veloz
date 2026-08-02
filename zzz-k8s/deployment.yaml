@@ -1,0 +1,166 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-gateway
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: api-gateway
+  template:
+    metadata:
+      labels:
+        app: api-gateway
+    spec:
+      containers:
+      - name: api-gateway
+        image: pedido-veloz-api-gateway:v1.0.0
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8080
+        env:
+        - name: PEDIDOS_URL
+          value: "http://servico-pedidos:3001"
+        - name: PAGAMENTOS_URL
+          value: "http://servico-pagamentos:3002"
+        - name: ESTOQUE_URL
+          value: "http://servico-estoque:3003"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 10
+          periodSeconds: 5
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: servico-pedidos
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: servico-pedidos
+  template:
+    metadata:
+      labels:
+        app: servico-pedidos
+    spec:
+      containers:
+      - name: servico-pedidos
+        image: pedido-veloz-servico-pedidos:v1.0.0
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 3001
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 3001
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 3001
+          initialDelaySeconds: 10
+          periodSeconds: 5
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: servico-pagamentos
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: servico-pagamentos
+  template:
+    metadata:
+      labels:
+        app: servico-pagamentos
+    spec:
+      containers:
+      - name: servico-pagamentos
+        image: pedido-veloz-servico-pagamentos:v1.0.0
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 3002
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 3002
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 3002
+          initialDelaySeconds: 10
+          periodSeconds: 5
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: servico-estoque
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: servico-estoque
+  template:
+    metadata:
+      labels:
+        app: servico-estoque
+    spec:
+      containers:
+      - name: servico-estoque
+        image: pedido-veloz-servico-estoque:v1.0.0
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 3003
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 3003
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 3003
+          initialDelaySeconds: 10
+          periodSeconds: 5
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      containers:
+      - name: postgres
+        image: postgres:16-alpine
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 5432
+        env:
+        - name: POSTGRES_USER
+          value: "postgres"
+        - name: POSTGRES_PASSWORD
+          value: "postgres"
+        - name: POSTGRES_DB
+          value: "pedidos"

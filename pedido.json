@@ -1,0 +1,10 @@
+{
+  "cliente": "João Silva",
+  "itens": [
+    {
+      "produto": "Notebook",
+      "quantidade": 1
+    }
+  ],
+  "total": 3500.00
+}
