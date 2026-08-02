@@ -250,5 +250,5 @@ GitHub Actions Documentation
 CNCF - Adobe Case Study
 
 🎥 Vídeo Pitch
-▶️ Link para o vídeo pitch: https://youtu.be/SEU-CODIGO-DO-VIDEO
+▶️ Link para o vídeo pitch: https://www.linkedin.com/posts/jean-waiss_college-task-microservices-based-order-platform-ugcPost-7489797958016745472-32_z/?utm_source=share&utm_medium=member_desktop&rcm=ACoAACBvErkB1MohiPsQCUAL47zfiSdLJ_IvacI
 
