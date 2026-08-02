@@ -45,6 +45,8 @@ A aplicação é composta por 4 microsserviços + banco de dados:
 │ (Porta 5432) │
 └───────────────────┘
 
+text
+
 ### 📦 Serviços
 
 | Serviço | Tecnologia | Porta | Descrição |
@@ -94,3 +96,159 @@ A aplicação é composta por 4 microsserviços + banco de dados:
    ```bash
    git clone https://github.com/seu-usuario/pedidos-veloz.git
    cd pedidos-veloz
+Suba todos os serviços com Docker Compose
+
+bash
+docker-compose up -d
+Verifique se todos os containers estão rodando
+
+bash
+docker ps
+Teste a aplicação no navegador
+
+API Gateway: http://localhost:8080
+
+Health Check: http://localhost:8080/health
+
+Listar Pedidos: http://localhost:8080/pedidos
+
+Listar Estoque: http://localhost:8080/estoque
+
+Listar Pagamentos: http://localhost:8080/pagamentos
+
+Para parar os containers
+
+bash
+docker-compose down
+🧪 Como testar a API
+Criar um pedido (PowerShell):
+
+powershell
+$body = '{"cliente":"João Silva","itens":[{"produto":"Notebook","quantidade":1}],"total":3500.00}'
+Invoke-RestMethod -Method POST -Uri "http://localhost:8080/pedidos" -Body $body -ContentType "application/json"
+Listar pedidos:
+
+powershell
+Invoke-RestMethod -Method GET -Uri "http://localhost:8080/pedidos"
+Listar estoque:
+
+powershell
+Invoke-RestMethod -Method GET -Uri "http://localhost:8080/estoque"
+Listar pagamentos:
+
+powershell
+Invoke-RestMethod -Method GET -Uri "http://localhost:8080/pagamentos"
+☸️ Kubernetes - Manifestos
+Os manifestos do Kubernetes estão na pasta zzz-k8s/:
+
+Arquivo	Descrição
+deployment.yaml	Definição dos Deployments (réplicas, probes, env)
+service.yaml	Exposição dos serviços (ClusterIP, LoadBalancer)
+configmap.yaml	Configurações não sensíveis (URLs, variáveis)
+secret.yaml	Dados sensíveis (senhas em base64)
+hpa.yaml	Escalabilidade automática (HPA)
+Aplicar no Kubernetes
+bash
+kubectl apply -f zzz-k8s/
+Verificar os recursos
+bash
+kubectl get pods
+kubectl get services
+kubectl get hpa
+🔄 CI/CD - GitHub Actions
+O pipeline automatizado (ci-cd.yml) executa:
+
+Build das imagens Docker
+
+Testes automatizados (health check e endpoints)
+
+Publicação simulada das imagens
+
+Deploy simulado no Kubernetes
+
+Estrutura do Pipeline
+yaml
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-test:
+    # Build, testes e publicação simulada
+  
+  deploy:
+    # Deploy no Kubernetes (simulado)
+📊 Estratégias de Deploy e Escala
+Estratégia de Deploy: Rolling Update
+O Kubernetes usa Rolling Update por padrão, substituindo gradualmente os pods antigos por novos, mantendo a aplicação disponível durante a atualização.
+
+Estratégia de Escala: HPA (Horizontal Pod Autoscaler)
+O HPA ajusta automaticamente o número de réplicas com base no uso de CPU:
+
+yaml
+minReplicas: 2
+maxReplicas: 5
+targetCPUUtilizationPercentage: 50
+🔍 Observabilidade (Proposta)
+A observabilidade da aplicação seria garantida por:
+
+Pilar	Ferramenta	Funcionalidade
+Métricas	Prometheus + Grafana	Monitoramento de performance e recursos
+Logs	ELK Stack	Centralização e análise de logs
+Tracing	Jaeger	Rastreamento distribuído de requisições
+Todos os serviços já possuem endpoints /health para verificação de saúde.
+
+📁 Estrutura do Projeto
+text
+pedidos-veloz/
+├── .github/
+│   └── workflows/
+│       └── ci-cd.yml            # Pipeline CI/CD
+├── api-gateway/
+│   ├── Dockerfile               # Multi-stage build
+│   ├── package.json
+│   └── server.js
+├── servico-estoque/
+│   ├── Dockerfile
+│   ├── package.json
+│   └── server.js
+├── servico-pagamentos/
+│   ├── Dockerfile
+│   ├── package.json
+│   └── server.js
+├── servico-pedidos/
+│   ├── Dockerfile
+│   ├── package.json
+│   └── server.js
+├── zzz-k8s/
+│   ├── configmap.yaml
+│   ├── deployment.yaml
+│   ├── hpa.yaml
+│   ├── secret.yaml
+│   └── service.yaml
+├── docker-compose.yml           # Ambiente local
+└── README.md                    # Documentação
+
+👨‍💻 Desenvolvedor
+Nome: Jean Alexander Waiss Lima
+Curso: Cloud DevOps - Orchestrating Containers and Micro Services
+Instituição: UNIFECAF
+Tutor(a): Fernando Leonid
+
+📄 Licença
+Este projeto é educacional e está sob a licença MIT.
+
+📚 Referências
+Docker Documentation
+Kubernetes Documentation
+GitHub Actions Documentation
+12-Factor App
+CNCF - Adobe Case Study
+
+🎥 Vídeo Pitch
+▶️ Link para o vídeo pitch: https://youtu.be/SEU-CODIGO-DO-VIDEO
+

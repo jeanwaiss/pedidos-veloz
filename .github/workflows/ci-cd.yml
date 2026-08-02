@@ -7,7 +7,7 @@ on:
     branches: [ main ]
 
 env:
-  DOCKER_REGISTRY: "docker.io"  # Simulado (pode ser Docker Hub, ECR, etc.)
+  DOCKER_REGISTRY: "docker.io"
   IMAGE_TAG: "v1.0.0"
 
 jobs:
@@ -24,6 +24,15 @@ jobs:
         docker build -t servico-pedidos:${{ env.IMAGE_TAG }} ./servico-pedidos
         docker build -t servico-pagamentos:${{ env.IMAGE_TAG }} ./servico-pagamentos
         docker build -t servico-estoque:${{ env.IMAGE_TAG }} ./servico-estoque
+    
+    - name: Publicação de imagens (SIMULADO)
+      run: |
+        echo "📦 Publicando imagens no registry..."
+        echo "docker push api-gateway:${{ env.IMAGE_TAG }}"
+        echo "docker push servico-pedidos:${{ env.IMAGE_TAG }}"
+        echo "docker push servico-pagamentos:${{ env.IMAGE_TAG }}"
+        echo "docker push servico-estoque:${{ env.IMAGE_TAG }}"
+        echo "✅ Publicação simulada concluída!"
     
     - name: Rodar os containers com Docker Compose
       run: docker-compose up -d
