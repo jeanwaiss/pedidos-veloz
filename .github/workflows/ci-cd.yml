@@ -35,7 +35,7 @@ jobs:
         echo "✅ Publicação simulada concluída!"
     
     - name: Rodar os containers com Docker Compose
-      run: docker-compose up -d
+      run: docker compose up -d
     
     - name: Testar API Gateway (health check)
       run: |
@@ -51,7 +51,7 @@ jobs:
         echo "✅ Todos os endpoints responderam!"
     
     - name: Parar os containers
-      run: docker-compose down
+      run: docker compose down
 
   deploy:
     needs: build-and-test
